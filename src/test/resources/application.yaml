@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:findit;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+  sql:
+    init:
+      mode: never
+
+findit:
+  auth:
+    jwt-secret: findit-local-secret-key-change-me-2026
+    jwt-expiration-minutes: 180
+    frontend-callback-url: http://localhost:3000/auth/callback

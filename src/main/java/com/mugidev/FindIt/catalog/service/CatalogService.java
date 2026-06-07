@@ -1,5 +1,7 @@
 package com.mugidev.FindIt.catalog.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mugidev.FindIt.catalog.domain.InventoryItem;
 import com.mugidev.FindIt.catalog.domain.Product;
 import com.mugidev.FindIt.catalog.domain.ProductCategory;
@@ -38,9 +40,11 @@ import com.mugidev.FindIt.user.domain.UserRole;
 import com.mugidev.FindIt.user.repository.UserAccountRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -66,6 +70,8 @@ public class CatalogService {
     private final InventoryItemRepository inventoryItemRepository;
     private final ShoppingListRepository shoppingListRepository;
     private final UserAccountRepository userAccountRepository;
+    private final RestClient restClient;
+    private final ObjectMapper objectMapper;
     private final double defaultRadiusKm;
 
     public CatalogService(StoreRepository storeRepository,
@@ -73,12 +79,19 @@ public class CatalogService {
                           InventoryItemRepository inventoryItemRepository,
                           ShoppingListRepository shoppingListRepository,
                           UserAccountRepository userAccountRepository,
+                          RestClient.Builder restClientBuilder,
+                          ObjectMapper objectMapper,
                           @Value("${findit.search.default-radius-km:5.0}") double defaultRadiusKm) {
         this.storeRepository = storeRepository;
         this.productRepository = productRepository;
         this.inventoryItemRepository = inventoryItemRepository;
         this.shoppingListRepository = shoppingListRepository;
         this.userAccountRepository = userAccountRepository;
+        this.restClient = restClientBuilder
+                .baseUrl("https://nominatim.openstreetmap.org")
+                .defaultHeader(HttpHeaders.USER_AGENT, "FindIt/0.1 (https://findit.local; support@findit.local)")
+                .build();
+        this.objectMapper = objectMapper;
         this.defaultRadiusKm = defaultRadiusKm;
     }
 
@@ -123,17 +136,13 @@ public class CatalogService {
     public StoreDetailResponse createStore(CreateStoreRequest request, String currentUserEmail) {
         UserAccount currentUser = requireUser(currentUserEmail);
         currentUser.promoteToStoreOwner();
+        String address = resolveStoreAddress(request.latitude(), request.longitude());
 
         Store store = new Store(
                 currentUser,
                 request.name().trim(),
                 request.category(),
-                String.format(
-                        Locale.US,
-                        "Ubicacion seleccionada %.5f, %.5f",
-                        request.latitude(),
-                        request.longitude()
-                ),
+                address,
                 request.latitude(),
                 request.longitude(),
                 5.0
@@ -150,7 +159,8 @@ public class CatalogService {
         UserAccount currentUser = requireUser(currentUserEmail);
         Store store = requireStore(storeId);
         assertCanManageStore(currentUser, store);
-        store.updateDetails(request.name().trim(), request.category(), request.latitude(), request.longitude());
+        String address = resolveStoreAddress(request.latitude(), request.longitude());
+        store.updateDetails(request.name().trim(), request.category(), address, request.latitude(), request.longitude());
         store.replacePhotos(toStorePhotos(request.photos()));
         return toStoreDetail(store, currentUser);
     }
@@ -517,6 +527,108 @@ public class CatalogService {
                         photo.imageDataUrl().trim()
                 ))
                 .toList();
+    }
+
+    private String resolveStoreAddress(double latitude, double longitude) {
+        try {
+            String payload = restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/reverse")
+                            .queryParam("format", "jsonv2")
+                            .queryParam("lat", latitude)
+                            .queryParam("lon", longitude)
+                            .queryParam("addressdetails", 1)
+                            .build())
+                    .retrieve()
+                    .body(String.class);
+
+            if (payload == null || payload.isBlank()) {
+                return formatStoreAddressFallback(latitude, longitude);
+            }
+
+            JsonNode root = objectMapper.readTree(payload);
+            String formattedAddress = formatStoreAddress(root);
+            return formattedAddress != null ? formattedAddress : formatStoreAddressFallback(latitude, longitude);
+        } catch (Exception exception) {
+            return formatStoreAddressFallback(latitude, longitude);
+        }
+    }
+
+    private String formatStoreAddress(JsonNode root) {
+        if (root == null || root.isNull()) {
+            return null;
+        }
+
+        JsonNode addressNode = root.path("address");
+        String road = firstNonBlank(
+                textValue(addressNode, "road"),
+                textValue(addressNode, "pedestrian"),
+                textValue(addressNode, "residential"),
+                textValue(addressNode, "footway"),
+                textValue(addressNode, "suburb"),
+                textValue(addressNode, "neighbourhood")
+        );
+        String houseNumber = textValue(addressNode, "house_number");
+        String city = firstNonBlank(
+                textValue(addressNode, "city"),
+                textValue(addressNode, "town"),
+                textValue(addressNode, "village"),
+                textValue(addressNode, "municipality"),
+                textValue(addressNode, "county")
+        );
+        String state = textValue(addressNode, "state");
+        String country = textValue(addressNode, "country");
+
+        List<String> parts = new ArrayList<>();
+
+        if (road != null) {
+            parts.add(houseNumber != null ? road + " #" + houseNumber : road);
+        }
+
+        if (city != null) {
+            parts.add(city);
+        }
+
+        if (state != null && (city == null || !state.equalsIgnoreCase(city))) {
+            parts.add(state);
+        }
+
+        if (parts.isEmpty()) {
+            String displayName = textValue(root, "display_name");
+            if (displayName != null) {
+                return displayName;
+            }
+        }
+
+        if (parts.isEmpty() && country != null) {
+            return country;
+        }
+
+        return parts.isEmpty() ? null : String.join(", ", parts);
+    }
+
+    private String formatStoreAddressFallback(double latitude, double longitude) {
+        return String.format(Locale.US, "Ubicacion seleccionada %.5f, %.5f", latitude, longitude);
+    }
+
+    private String textValue(JsonNode node, String fieldName) {
+        JsonNode valueNode = node.path(fieldName);
+        if (!valueNode.isTextual()) {
+            return null;
+        }
+
+        String value = valueNode.asText().trim();
+        return value.isEmpty() ? null : value;
+    }
+
+    private String firstNonBlank(String... values) {
+        for (String value : values) {
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+        }
+
+        return null;
     }
 
     private Product resolveProduct(String productName, ProductCategory productCategory, String unit) {

@@ -3004,7 +3004,7 @@ export function FindItDashboard() {
                 ) : isEditingStoreLocation ? (
                   <form className={styles.stack} onSubmit={handleCreateStore}>
                     <div className={styles.coordinateBadge}>
-                      Nueva ubicación en {formatCoordinates(draftStore.latitude, draftStore.longitude)}
+                      La dirección se calculará automáticamente al guardar
                     </div>
 
                     <div className={styles.emptyHint}>
@@ -3032,7 +3032,7 @@ export function FindItDashboard() {
                 ) : (
                   <form className={styles.stack} onSubmit={handleCreateStore}>
                     <div className={styles.coordinateBadge}>
-                      Pin listo en {formatCoordinates(draftStore.latitude, draftStore.longitude)}
+                      La dirección se calculará automáticamente al guardar
                     </div>
 
                     <div>
@@ -3622,7 +3622,7 @@ export function FindItDashboard() {
                           <form className={styles.stack} onSubmit={handleUpdateBusiness}>
                             <div className={styles.stack}>
                               <div className={styles.coordinateBadge}>
-                                Ubicación actual: {formatCoordinates(selectedStore.latitude, selectedStore.longitude)}
+                                Dirección actual: {selectedStore.address}
                               </div>
 
                               <button

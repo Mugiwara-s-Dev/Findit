@@ -96,9 +96,10 @@ public class Store {
         photo.assignStore(this);
     }
 
-    public void updateDetails(String name, StoreCategory category, double latitude, double longitude) {
+    public void updateDetails(String name, StoreCategory category, String address, double latitude, double longitude) {
         this.name = name;
         this.category = category;
+        this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
     }

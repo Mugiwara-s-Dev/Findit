@@ -29,9 +29,6 @@ public class UserAccount {
     @Column(nullable = false)
     private String passwordHash;
 
-    @Column(unique = true)
-    private String googleSubject;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
@@ -79,10 +76,6 @@ public class UserAccount {
         return passwordHash;
     }
 
-    public String getGoogleSubject() {
-        return googleSubject;
-    }
-
     public UserRole getRole() {
         return role;
     }
@@ -97,10 +90,6 @@ public class UserAccount {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public void linkGoogleAccount(String googleSubject) {
-        this.googleSubject = googleSubject;
     }
 
     public void refreshProfile(String fullName, String email) {

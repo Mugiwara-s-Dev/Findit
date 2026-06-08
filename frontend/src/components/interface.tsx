@@ -73,8 +73,8 @@ const productCategoryOptions: Array<{ value: ProductCategory; label: string }> =
 // ## LOGIN
 
 const emptyLogin = {
-  email: "admin@findit.local",
-  password: "secret123",
+  email: "",
+  password: "",
 };
 
 const emptySignup = {

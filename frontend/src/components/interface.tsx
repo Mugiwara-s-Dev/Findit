@@ -71,6 +71,7 @@ const productCategoryOptions: Array<{ value: ProductCategory; label: string }> =
   { value: "PERSONAL_CARE", label: "Cuidado personal" },
 ];
 
+// Estados base para autenticacion y formularios iniciales.
 // ## LOGIN
 
 const emptyLogin = {
@@ -147,6 +148,7 @@ type DashboardNotification = {
 };
 
 export function FindItDashboard() {
+  // Estado global de la pantalla principal.
   const [isReady, setIsReady] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [authSession, setAuthSession] = useState<AuthSession | null>(null);
@@ -219,6 +221,7 @@ export function FindItDashboard() {
   const notificationTimersRef = useRef<Record<number, number>>({});
   const notificationSequenceRef = useRef(1);
 
+  // Datos derivados que se recalculan cuando cambia la sesion, la ubicacion o el plan.
   const selectedUser = authSession?.user ?? null;
   const activeLocation = mapLocation ?? buildSavedLocation(selectedUser);
   const mapStores = mergeStores(nearbyStores, managedStores);
@@ -259,6 +262,8 @@ export function FindItDashboard() {
   const shoppingViewportStores = shoppingRouteStops
     .map((stop) => mapStores.find((store) => store.id === stop.storeId) ?? null)
     .filter((store): store is StoreSummary => store !== null);
+
+  // Efectos de sincronizacion entre sesion, mapa, listas y plan de compras.
   const businessesUnlocked =
     managedStores.length > 0 ||
     selectedUser?.role === "STORE_OWNER" ||
@@ -299,6 +304,7 @@ export function FindItDashboard() {
     selectedStoreIdRef.current = selectedStoreId;
   }, [selectedStoreId]);
 
+  // Limpia timers pendientes cuando el dashboard se desmonta.
   useEffect(() => () => {
     Object.values(shoppingSuggestionTimeoutsRef.current).forEach((timeoutId) => window.clearTimeout(timeoutId));
     if (shoppingSuggestionBlurTimeoutRef.current !== null) {
@@ -315,6 +321,7 @@ export function FindItDashboard() {
     pushNotification("error", "Algo salió mal", error);
   }, [error]);
 
+  // Persistencia de sesion y sincronizacion de la ubicacion con el usuario.
   const persistSession = useCallback((
     session: AuthSession | null,
     options: { syncLocation?: boolean } = {},
@@ -341,6 +348,7 @@ export function FindItDashboard() {
     setMapLocation(null);
   }, []);
 
+  // Reinicia el espacio de trabajo completo cuando cambia el contexto principal.
   const resetWorkspace = useCallback(() => {
     setIsSidebarOpen(true);
     setAreMapPanelsOpen(false);
@@ -392,6 +400,7 @@ export function FindItDashboard() {
     setViewportVersion(0);
   }, []);
 
+  // Borra resultados de compra cuando se modifica la lista o las opciones.
   const resetShoppingResults = useCallback(() => {
     setShoppingPlan(null);
     setSelectedShoppingOptions({});
@@ -401,6 +410,7 @@ export function FindItDashboard() {
     });
   }, []);
 
+  // Manejo de notificaciones temporales.
   const pushNotification = useCallback((tone: NotificationTone, title: string, message: string) => {
     const id = notificationSequenceRef.current++;
 
@@ -428,7 +438,7 @@ export function FindItDashboard() {
     setNotifications((current) => current.filter((notification) => notification.id !== id));
   }, []);
 
-
+  // Construye la lista editable de productos para compras nuevas o cargadas.
   const buildDraftShoppingItems = useCallback((productQueries: string[]) => {
     const trimmedQueries = productQueries
       .map((productQuery) => productQuery.trim())
@@ -450,11 +460,13 @@ export function FindItDashboard() {
     });
   }, []);
 
+  // Carga las listas guardadas del usuario autenticado.
   const loadSavedShoppingLists = useCallback(async () => {
     setIsLoadingSavedShoppingLists(true);
 
     try {
       const response = await apiFetch<SavedShoppingList[]>("/shopping/lists");
+  // Sugerencias de productos mientras el usuario escribe una busqueda.
       setSavedShoppingLists(sortSavedShoppingLists(response));
     } catch {
       setSavedShoppingLists([]);
@@ -530,12 +542,14 @@ export function FindItDashboard() {
     }
   }, []);
 
+  // Detecta la ubicacion del dispositivo para centrar el mapa.
   const collapseSidebarOnSmallScreens = useCallback(() => {
     if (typeof window !== "undefined" && window.innerWidth <= 980) {
       setIsSidebarOpen(false);
     }
   }, []);
 
+  // Mantiene sincronizado el formulario del modulo de negocio.
   const resetBusinessWorkspace = useCallback((nextSection: BusinessSection = "INVENTORY") => {
     setEditingInventoryItemId(null);
     setProductForm(emptyProductForm);
@@ -545,6 +559,7 @@ export function FindItDashboard() {
     setBusinessSection(nextSection);
   }, []);
 
+  // Ubicacion actual del usuario para calcular distancias y rutas.
   const requestDeviceLocation = useCallback(() => {
     if (typeof window === "undefined" || !("geolocation" in navigator)) {
       setStatus("Seguimos con tu zona guardada.");
@@ -576,6 +591,7 @@ export function FindItDashboard() {
     );
   }, []);
 
+    // Carga tiendas cercanas y tiendas administradas para la vista principal.
   const loadNearbyStores = useCallback(async (location: MapLocation) => {
     const loadedStores = await apiFetch<StoreSummary[]>(
       `/stores?userLat=${location.latitude}&userLng=${location.longitude}&radiusKm=${defaultSearchRadiusKm}`,
@@ -601,6 +617,7 @@ export function FindItDashboard() {
     return sortedStores;
   }, []);
 
+  // Carga los datos al iniciar la sesion y al cambiar la ubicacion activa.
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
       const session = readInitialSession();
@@ -616,6 +633,7 @@ export function FindItDashboard() {
     return () => window.clearTimeout(timeoutId);
   }, []);
 
+  // Refresca las tiendas al cambiar la sesion autenticada.
   useEffect(() => {
     if (!authSession) {
       return;
@@ -628,6 +646,7 @@ export function FindItDashboard() {
     return () => window.clearTimeout(timeoutId);
   }, [authSession, requestDeviceLocation]);
 
+  // Carga el detalle de la tienda seleccionada.
   useEffect(() => {
     if (!authSession || !activeLocation) {
       return;
@@ -723,6 +742,7 @@ export function FindItDashboard() {
     };
   }, [authSession, selectedStoreId]);
 
+  // Ajusta el modulo de negocio cuando no hay tiendas administradas.
   useEffect(() => {
     if (module !== "MY_BUSINESSES") {
       return;
@@ -739,6 +759,7 @@ export function FindItDashboard() {
     }
   }, [managedStores, module, resetBusinessWorkspace]);
 
+  // Asegura que la tienda seleccionada pertenezca al plan actual de compra.
   useEffect(() => {
     if (module !== "SHOPPING") {
       return;
@@ -753,6 +774,7 @@ export function FindItDashboard() {
     }
   }, [module, shoppingRouteStops]);
 
+  // Calcula la ruta final cuando hay una secuencia de paradas valida.
   useEffect(() => {
     if (module !== "SHOPPING") {
       return;
@@ -1145,6 +1167,7 @@ export function FindItDashboard() {
     );
   }
 
+  // Flujo de configuracion de compras: paso inicial de origen y lista.
   function handleContinueShoppingSetup() {
     setShoppingWorkflowStep("SOURCE");
     setShoppingListSource(null);
@@ -1155,6 +1178,7 @@ export function FindItDashboard() {
     );
   }
 
+  // Carga una lista de compra nueva o una guardada.
   function handleSelectShoppingListSource(nextSource: Exclude<ShoppingListSource, null>) {
     setShoppingListSource(nextSource);
 
@@ -1174,6 +1198,7 @@ export function FindItDashboard() {
     setStatus("Selecciona una lista guardada para cargar sus productos.");
   }
 
+  // Reinicia la lista para empezar desde cero.
   function handleStartFreshShoppingList() {
     setShoppingListSource("NEW");
     setShoppingListName("");
@@ -3957,6 +3982,7 @@ function buildSavedShoppingListCardClass(moduleStyles: typeof styles, isActive: 
     : moduleStyles.shoppingSavedListCard;
 }
 
+// Orden y mezcla de tiendas que se muestran en el mapa y en los paneles.
 function sortStores(stores: StoreSummary[]) {
   return [...stores].sort((left, right) => {
     if (left.distanceKm === null && right.distanceKm === null) {
@@ -4017,7 +4043,8 @@ function resolveQuantityAvailableForSave(store: StoreDetail | null, editingInven
   return store.inventory.find((item) => item.inventoryItemId === editingInventoryItemId)?.quantityAvailable ?? 0;
 }
 
-function buildShoppingRouteStops(
+// Construye las paradas agrupando productos por tienda y ordenandolas por cercania.
+function  buildShoppingRouteStops(
   plan: ShoppingPlan | null,
   selectedOptions: Record<string, number | null>,
   origin: MapLocation,
@@ -4111,6 +4138,7 @@ function buildShoppingRouteStops(
   return orderedStops;
 }
 
+// Reemplaza o inserta una tienda manteniendo el orden de presentacion.
 function upsertStore(currentStores: StoreSummary[], nextStore: StoreSummary) {
   return sortStores([
     ...currentStores.filter((store) => store.id !== nextStore.id),
@@ -4118,6 +4146,7 @@ function upsertStore(currentStores: StoreSummary[], nextStore: StoreSummary) {
   ]);
 }
 
+// Convierte un detalle completo en el resumen que consume el mapa.
 function toStoreSummary(store: StoreDetail, activeLocation: MapLocation): StoreSummary {
   return {
     id: store.id,
@@ -4157,10 +4186,12 @@ function toRadians(value: number) {
   return (value * Math.PI) / 180;
 }
 
+// Redondeo uniforme para distancias, totales y puntajes visibles.
 function round(value: number) {
   return Math.round(value * 100) / 100;
 }
 
+// Conversiones entre adjuntos de tienda/inventario y formularios temporales.
 function toDraftPhoto(photo: StoreDetail["photos"][number]): DraftPhoto {
   return {
     filename: photo.filename,

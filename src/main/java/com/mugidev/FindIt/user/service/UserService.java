@@ -35,14 +35,14 @@ public class UserService {
     public UserResponse getUser(Long userId) {
         return userAccountRepository.findById(userId)
                 .map(this::toResponse)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id " + userId));
+                .orElseThrow(() -> new EntityNotFoundException("No hemos encontrado un usuario con id " + userId));
     }
 
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
         userAccountRepository.findByEmailIgnoreCase(request.email())
                 .ifPresent(existing -> {
-                    throw new EntityExistsException("A user with email " + request.email() + " already exists");
+                    throw new EntityExistsException("Un usuario con email " + request.email() + " ya existe");
                 });
 
         UserAccount user = new UserAccount(

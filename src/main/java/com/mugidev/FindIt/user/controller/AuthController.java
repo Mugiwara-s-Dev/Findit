@@ -1,3 +1,4 @@
+// Expone el endpoint de login para obtener JWT.
 package com.mugidev.FindIt.user.controller;
 
 import com.mugidev.FindIt.user.dto.AuthResponse;

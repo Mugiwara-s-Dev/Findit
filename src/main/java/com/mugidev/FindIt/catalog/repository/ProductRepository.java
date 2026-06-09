@@ -1,3 +1,4 @@
+// Acceso JPA para productos del catalogo.
 package com.mugidev.FindIt.catalog.repository;
 
 import com.mugidev.FindIt.catalog.domain.Product;

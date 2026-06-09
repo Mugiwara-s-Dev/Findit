@@ -1,3 +1,4 @@
+// Parseador e importador de productos desde archivos CSV.
 import type { BarcodeLookupResult, ProductCategory } from "@/lib/types";
 
 export type ProductCsvRow = {

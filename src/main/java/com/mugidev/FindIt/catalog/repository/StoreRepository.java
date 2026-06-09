@@ -1,3 +1,4 @@
+// Acceso JPA para tiendas y sus relaciones cargadas.
 package com.mugidev.FindIt.catalog.repository;
 
 import com.mugidev.FindIt.catalog.domain.Store;

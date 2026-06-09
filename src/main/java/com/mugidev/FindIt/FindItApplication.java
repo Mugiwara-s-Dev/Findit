@@ -1,3 +1,4 @@
+// Punto de entrada de la aplicacion Spring Boot de FindIt.
 package com.mugidev.FindIt;
 
 import org.springframework.boot.SpringApplication;

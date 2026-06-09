@@ -1,3 +1,4 @@
+// Consulta Open Food Facts para completar datos de un codigo de barras.
 package com.mugidev.FindIt.catalog.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

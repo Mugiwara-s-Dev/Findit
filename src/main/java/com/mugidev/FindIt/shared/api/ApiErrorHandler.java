@@ -1,3 +1,4 @@
+// Convierte excepciones comunes en respuestas HTTP consistentes.
 package com.mugidev.FindIt.shared.api;
 
 import jakarta.persistence.EntityExistsException;

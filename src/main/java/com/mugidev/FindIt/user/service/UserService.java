@@ -1,3 +1,4 @@
+// Gestiona la logica de negocio de las cuentas de usuario.
 package com.mugidev.FindIt.user.service;
 
 import com.mugidev.FindIt.user.domain.UserAccount;

@@ -1,3 +1,4 @@
+// Contenedor principal del dashboard y de toda la logica de UI.
 "use client";
 
 import dynamic from "next/dynamic";

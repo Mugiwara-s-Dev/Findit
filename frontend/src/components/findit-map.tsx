@@ -1,3 +1,4 @@
+// Mapa interactivo para mostrar tiendas, rutas y ubicacion actual.
 "use client";
 
 import { useEffect, useRef } from "react";

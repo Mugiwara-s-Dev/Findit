@@ -1,3 +1,4 @@
+// Entidad JPA que representa una tienda con inventario y fotos.
 package com.mugidev.FindIt.catalog.domain;
 
 import jakarta.persistence.CascadeType;

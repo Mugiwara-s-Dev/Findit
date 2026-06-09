@@ -1,3 +1,4 @@
+// Entidad JPA que almacena fotos asociadas a una tienda.
 package com.mugidev.FindIt.catalog.domain;
 
 import jakarta.persistence.Column;

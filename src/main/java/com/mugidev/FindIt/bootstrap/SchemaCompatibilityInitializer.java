@@ -1,3 +1,6 @@
+// corrige compatibilidades del esquema al arrancar
+
+// Ajusta compatibilidad del esquema al arrancar la aplicacion.
 package com.mugidev.FindIt.bootstrap;
 
 import org.springframework.boot.CommandLineRunner;

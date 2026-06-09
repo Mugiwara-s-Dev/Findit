@@ -1,3 +1,4 @@
+// Entidad JPA para cada item de una lista de compras.
 package com.mugidev.FindIt.catalog.domain;
 
 import jakarta.persistence.Column;

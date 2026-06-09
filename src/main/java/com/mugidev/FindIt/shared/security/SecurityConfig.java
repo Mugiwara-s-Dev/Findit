@@ -1,3 +1,6 @@
+// Configura la seguridad de la aplicación, incluyendo autenticación JWT y manejo de excepciones.
+
+// Define la politica de seguridad y autenticacion JWT.
 package com.mugidev.FindIt.shared.security;
 
 import org.springframework.context.annotation.Bean;

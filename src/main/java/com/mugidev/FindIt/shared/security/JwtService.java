@@ -1,3 +1,5 @@
+// Servicio para generar y validar tokens JWT para autenticación de usuarios.
+// Genera y valida tokens JWT para la sesion de usuario.
 package com.mugidev.FindIt.shared.security;
 
 import com.mugidev.FindIt.user.domain.UserAccount;

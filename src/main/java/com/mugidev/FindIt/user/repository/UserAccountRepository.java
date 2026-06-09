@@ -1,3 +1,4 @@
+// Acceso JPA para cuentas de usuario.
 package com.mugidev.FindIt.user.repository;
 
 import com.mugidev.FindIt.user.domain.UserAccount;

@@ -1,3 +1,6 @@
+// Configura CORS para permitir al frontend llamar a la API.
+
+// Configura CORS para permitir llamadas del frontend a la API.
 package com.mugidev.FindIt.shared.config;
 
 import org.springframework.beans.factory.annotation.Value;

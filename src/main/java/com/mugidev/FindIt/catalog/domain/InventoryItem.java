@@ -1,3 +1,4 @@
+// Entidad JPA que une un producto con una tienda y su precio.
 package com.mugidev.FindIt.catalog.domain;
 
 import jakarta.persistence.Column;

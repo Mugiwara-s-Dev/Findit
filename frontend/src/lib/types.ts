@@ -1,3 +1,4 @@
+// Tipos TypeScript que reflejan requests y respuestas de la API.
 export type StoreCategory =
   | "GROCERY"
   | "PHARMACY"

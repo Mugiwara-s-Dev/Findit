@@ -1,3 +1,4 @@
+// Entidad JPA que representa un producto del catalogo.
 package com.mugidev.FindIt.catalog.domain;
 
 import jakarta.persistence.Column;

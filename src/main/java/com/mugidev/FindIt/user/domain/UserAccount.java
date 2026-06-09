@@ -1,3 +1,4 @@
+// Entidad JPA que representa una cuenta de usuario.
 package com.mugidev.FindIt.user.domain;
 
 import jakarta.persistence.Column;

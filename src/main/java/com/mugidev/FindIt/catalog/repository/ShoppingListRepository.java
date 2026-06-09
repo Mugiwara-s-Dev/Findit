@@ -1,3 +1,4 @@
+// Acceso JPA para listas de compra guardadas.
 package com.mugidev.FindIt.catalog.repository;
 
 import com.mugidev.FindIt.catalog.domain.ShoppingList;

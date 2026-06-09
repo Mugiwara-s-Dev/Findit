@@ -1,3 +1,4 @@
+// Valida credenciales y construye la sesion autenticada.
 package com.mugidev.FindIt.user.service;
 
 import com.mugidev.FindIt.shared.security.JwtService;

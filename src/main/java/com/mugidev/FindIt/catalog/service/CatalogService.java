@@ -1,3 +1,4 @@
+// Contiene la logica principal del catalogo y los planes de compra.
 package com.mugidev.FindIt.catalog.service;
 
 import com.fasterxml.jackson.databind.JsonNode;

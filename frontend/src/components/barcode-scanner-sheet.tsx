@@ -1,3 +1,4 @@
+// Escaner de codigo de barras con acceso a la camara.
 "use client";
 
 import { BrowserCodeReader, BrowserMultiFormatReader } from "@zxing/browser";

@@ -1,3 +1,4 @@
+// Layout global de la aplicacion FindIt en Next.js.
 import type { Metadata } from "next";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";

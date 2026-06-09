@@ -1,3 +1,4 @@
+// Expone la API del catalogo, tiendas, inventario y compras.
 package com.mugidev.FindIt.catalog.controller;
 
 import com.mugidev.FindIt.catalog.domain.StoreCategory;

@@ -1,3 +1,4 @@
+// Lee el Bearer token y carga la autenticacion en cada request.
 package com.mugidev.FindIt.shared.security;
 
 import com.mugidev.FindIt.user.repository.UserAccountRepository;

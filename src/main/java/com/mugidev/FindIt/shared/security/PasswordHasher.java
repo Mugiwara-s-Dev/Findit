@@ -1,3 +1,5 @@
+// Componente para hashear contraseñas usando SHA-256.
+// Hashea y compara contrasenas con SHA-256.
 package com.mugidev.FindIt.shared.security;
 
 import org.springframework.stereotype.Component;

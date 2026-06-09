@@ -1,3 +1,4 @@
+// Expone la API de usuarios para listar, consultar y crear cuentas.
 package com.mugidev.FindIt.user.controller;
 
 import com.mugidev.FindIt.user.dto.CreateUserRequest;

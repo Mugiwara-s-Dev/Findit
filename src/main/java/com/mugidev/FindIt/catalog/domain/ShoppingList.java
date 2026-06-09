@@ -1,3 +1,4 @@
+// Entidad JPA que guarda una lista de compras del usuario.
 package com.mugidev.FindIt.catalog.domain;
 
 import com.mugidev.FindIt.user.domain.UserAccount;

@@ -1,3 +1,4 @@
+// Categorias disponibles para productos del catalogo.
 package com.mugidev.FindIt.catalog.domain;
 
 public enum ProductCategory {
